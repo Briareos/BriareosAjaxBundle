@@ -1,0 +1,9 @@
+services:
+    templating.ajax:
+        class: Briareos\AjaxBundle\Twig\AjaxEngine
+        arguments:
+            - @twig
+            - @templating.name_parser
+            - @templating.locator
+            - @templating.globals
+

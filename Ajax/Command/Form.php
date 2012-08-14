@@ -4,15 +4,14 @@ namespace Briareos\AjaxBundle\Ajax\Command;
 
 use Briareos\AjaxBundle\Ajax\Command\AjaxCommandInterface;
 
-class AjaxCommandForm implements AjaxCommandInterface
+class Form implements AjaxCommandInterface
 {
     private $id;
 
     private $body;
 
-    public function __construct($id, $body)
+    public function __construct($body)
     {
-        $this->id = $id;
         $this->body = $body;
     }
 
@@ -24,7 +23,6 @@ class AjaxCommandForm implements AjaxCommandInterface
     public function getArguments()
     {
         return array(
-            'id' => $this->id,
             'body' => $this->body,
         );
     }

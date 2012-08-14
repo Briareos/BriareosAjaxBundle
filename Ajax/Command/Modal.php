@@ -4,25 +4,24 @@ namespace Briareos\AjaxBundle\Ajax\Command;
 
 use Briareos\AjaxBundle\Ajax\Command\AjaxCommandInterface;
 
-class AjaxCommandState implements AjaxCommandInterface
+class Modal implements AjaxCommandInterface
 {
-    private $state;
+    private $body;
 
-    public function __construct(array $state)
+    public function __construct($body)
     {
-        $this->state = $state;
+        $this->body = $body;
     }
 
     public function getName()
     {
-        return 'state';
+        return 'modal';
     }
 
     public function getArguments()
     {
         return array(
-            'state' => $this->state,
+            'body' => $this->body,
         );
     }
-
 }

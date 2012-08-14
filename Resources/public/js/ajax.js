@@ -1,45 +1,23 @@
-$(document).ready(function () {
+$(function () {
     "use strict";
 
     var $context = $('body');
+    var History = window.History;
+    History.programmatic = false;
 
     $context.ajaxSend(function (event, xhr, settings) {
+        if (typeof settings.context !== 'undefined' && settings.context.length) {
+            $('[type="submit"]', settings.context).button('loading');
+        }
     });
 
     $context.ajaxSuccess(function (event, xhr, settings, data) {
-        if (!data) {
-            return;
-        }
-        if (typeof data.form !== 'undefined') {
-            var formSelector = '#' + data.form.id;
-            $(formSelector).replaceWith(data.form.body);
-            var $form = $(formSelector);
-        }
-        if (typeof data.modal !== 'undefined') {
-            var $modal = $('div.modal:visible');
-            if (!$modal.length) {
-                $modal = $('<div class="modal fade hide"></div>');
+        if ($.isPlainObject(data) && $.isArray(data.commands)) {
+            for (var i = 0; i < data.commands.length; i++) {
+                var command = data.commands[i];
+                Ajax.command[command.name](command['arguments'], settings);
             }
-            $modal.html(data.modal.body);
-            $modal.modal('show');
-        }
-        if (typeof data.location !== 'undefined') {
-            if (data.location.url) {
-                if (data.location.replace) {
-                    window.document.location.replace(data.location.url);
-                } else {
-                    window.document.location.href = data.location.url;
-                }
-            } else {
-                window.document.location.reload();
-            }
-        }
-        if (typeof data.page !== 'undefined') {
-            window.document.title = data.page.title;
-            $context.find('div#body:first').html(data.page.body);
-        }
-        if (typeof data.state !== 'undefined') {
-            $.bbq.pushState(data.state);
+            Ajax.ready();
         }
     });
 
@@ -48,7 +26,13 @@ $(document).ready(function () {
             // Browser was refreshed during an ajax request.
             return;
         }
-        var $modal = $('<div class="modal fade hide"></div>');
+        var $modal = $('div.modal.modal-error');
+        if (!$modal.length) {
+            $modal = $('<div class="modal modal-error fade hide"></div>');
+        } else {
+            $modal.html('');
+        }
+
         var $modalHeader = $('<div class="modal-header"></div>')
             .append('<button type="button" class="close" data-dismiss="modal">×</button>')
             .append($('<h3></h3>').text(xhr.status + ' ' + error))
@@ -73,7 +57,16 @@ $(document).ready(function () {
     });
 
     $context.ajaxComplete(function (event, xhr, settings) {
+    });
 
+    History.Adapter.bind(window, 'statechange', function () {
+        var State = History.getState();
+        if (History.programmatic === false) {
+            $.ajax({
+                url:State.url,
+                context:'history'
+            });
+        }
     });
 
     $context.on('click', 'a[data-ajax]', function (event) {
@@ -93,4 +86,67 @@ $(document).ready(function () {
         return false;
     });
 
+    var AjaxReady = {};
+
+    var Ajax = {};
+    Ajax.command = {};
+
+    Ajax.ready = function () {
+        var i;
+        for (i in AjaxReady) {
+            if ($.isFunction(AjaxReady[i])) {
+                AjaxReady[i]();
+            }
+        }
+    };
+
+    Ajax.command.location = function (settings) {
+        if (settings.url) {
+            if (settings.replace) {
+                window.document.location.replace(settings.url);
+            } else {
+                window.document.location.href = settings.url;
+            }
+        } else {
+            window.document.location.reload();
+        }
+    };
+
+    Ajax.command.form = function (settings) {
+        var $form = $(settings.body);
+        var formId = $form.attr('id');
+        $('#' + formId, $context).replaceWith($form);
+    };
+
+    Ajax.command.modal = function (settings) {
+        var $modal = $('div.modal.modal-ajax');
+        if (!$modal.length) {
+            $modal = $('<div class="modal modal-ajax fade hide"></div>');
+        } else {
+            $modal.html('');
+        }
+        $modal.html(settings.body);
+        $modal.modal('show');
+    };
+
+    Ajax.command.page = function (settings, ajaxSettings) {
+        window.document.title = settings.title;
+        $context.find('#' + settings.segment).html(settings.body);
+        if (ajaxSettings.context instanceof $) {
+            if (ajaxSettings.context.prop('tagName') === 'A') {
+                History.programmatic = true;
+                History.pushState(null, null, ajaxSettings.context.attr('href'));
+                History.programmatic = false;
+            } else if (typeof ajaxSettings.context.get(0).form !== 'undefined') {
+                History.programmatic = true;
+                History.pushState(null, null, $(ajaxSettings.context.get(0).form).attr('action'));
+                History.programmatic = false;
+            }
+        }
+    };
+
+    Ajax.command.state = function (settings, ajaxSettings) {
+    };
+
+    window.AjaxReady = AjaxReady;
 });
