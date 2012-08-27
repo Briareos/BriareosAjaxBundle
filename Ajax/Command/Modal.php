@@ -2,9 +2,9 @@
 
 namespace Briareos\AjaxBundle\Ajax\Command;
 
-use Briareos\AjaxBundle\Ajax\Command\AjaxCommandInterface;
+use Briareos\AjaxBundle\Ajax\CommandInterface;
 
-class Modal implements AjaxCommandInterface
+class Modal implements CommandInterface
 {
     private $body;
 

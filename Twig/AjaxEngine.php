@@ -13,6 +13,7 @@ class AjaxEngine extends TwigEngine
     public function renderBlock($templateName, $blockName, $variables = array())
     {
         // We can do this for free, since we always get the same template instance.
+        /** @var $template \Twig_Template */
         $template = $this->environment->loadTemplate($templateName);
         return $template->renderBlock($blockName, array_merge($this->environment->getGlobals(), $variables));
     }

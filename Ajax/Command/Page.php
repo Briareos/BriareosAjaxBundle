@@ -2,20 +2,23 @@
 
 namespace Briareos\AjaxBundle\Ajax\Command;
 
-use Briareos\AjaxBundle\Ajax\Command\AjaxCommandInterface;
+use Briareos\AjaxBundle\Ajax\CommandInterface;
 
-class Page implements AjaxCommandInterface
+class Page implements CommandInterface
 {
     private $title;
 
     private $body;
 
+    private $url;
+
     private $segment;
 
-    public function __construct($title, $body, $segment = 'body')
+    public function __construct($title, $body, $url, $segment = 'body')
     {
         $this->title = $title;
         $this->body = $body;
+        $this->url = $url;
         $this->segment = $segment;
     }
 
@@ -29,6 +32,7 @@ class Page implements AjaxCommandInterface
         return array(
             'title' => $this->title,
             'body' => $this->body,
+            'url' => $this->url,
             'segment' => $this->segment,
         );
     }

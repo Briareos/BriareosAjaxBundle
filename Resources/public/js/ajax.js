@@ -17,7 +17,6 @@ $(function () {
                 var command = data.commands[i];
                 Ajax.command[command.name](command['arguments'], settings);
             }
-            Ajax.ready();
         }
     });
 
@@ -61,44 +60,54 @@ $(function () {
 
     History.Adapter.bind(window, 'statechange', function () {
         var State = History.getState();
+        var pjaxContainers = [];
+        $context.find('[data-pjax-container]').each(function () {
+            pjaxContainers.push($(this).data('pjax-container'));
+        });
         if (History.programmatic === false) {
             $.ajax({
                 url:State.url,
-                context:'history'
+                context:'history',
+                data:{
+                    _pjax:pjaxContainers
+                }
             });
         }
     });
 
     $context.on('click', 'a[data-ajax]', function (event) {
         var $link = $(this);
+        var pjaxContainers = [];
+        $context.find('[data-pjax-container]').each(function () {
+            pjaxContainers.push($(this).data('pjax-container'));
+        });
         $.ajax({
             url:$link.attr('href'),
-            context:$link
+            context:$link,
+            data:{
+                _pjax:pjaxContainers
+            }
         });
         return false;
     });
 
     $context.on('submit', 'form[data-ajax]', function (event) {
         var $form = $(this);
+        var pjaxContainers = [];
+        $context.find('[data-pjax-container]').each(function () {
+            pjaxContainers.push($(this).data('pjax-container'));
+        });
         $form.ajaxSubmit({
-            context:$form
+            context:$form,
+            data:{
+                _pjax:pjaxContainers
+            }
         });
         return false;
     });
 
-    var AjaxReady = {};
-
     var Ajax = {};
     Ajax.command = {};
-
-    Ajax.ready = function () {
-        var i;
-        for (i in AjaxReady) {
-            if ($.isFunction(AjaxReady[i])) {
-                AjaxReady[i]();
-            }
-        }
-    };
 
     Ajax.command.location = function (settings) {
         if (settings.url) {
@@ -114,6 +123,9 @@ $(function () {
 
     Ajax.command.form = function (settings) {
         var $form = $(settings.body);
+        $('.flash-messages', $context).slideUp(function () {
+            $(this).remove();
+        });
         var formId = $form.attr('id');
         $('#' + formId, $context).replaceWith($form);
     };
@@ -130,23 +142,15 @@ $(function () {
     };
 
     Ajax.command.page = function (settings, ajaxSettings) {
-        window.document.title = settings.title;
-        $context.find('#' + settings.segment).html(settings.body);
-        if (ajaxSettings.context instanceof $) {
-            if (ajaxSettings.context.prop('tagName') === 'A') {
-                History.programmatic = true;
-                History.pushState(null, null, ajaxSettings.context.attr('href'));
-                History.programmatic = false;
-            } else if (typeof ajaxSettings.context.get(0).form !== 'undefined') {
-                History.programmatic = true;
-                History.pushState(null, null, $(ajaxSettings.context.get(0).form).attr('action'));
-                History.programmatic = false;
-            }
+        var $pjaxContent = $(settings.body);
+        $context.find('[data-pjax-container="' + settings.segment + '"]').html($pjaxContent);
+        if ($context.scrollTop() > $pjaxContent.offset().top) {
+            $context.animate({scrollTop:$pjaxContent.offset().top - 10});
+        }
+        if (ajaxSettings.context !== 'history') {
+            History.programmatic = true;
+            History.pushState({body:settings.body}, settings.title, settings.url);
+            History.programmatic = false;
         }
     };
-
-    Ajax.command.state = function (settings, ajaxSettings) {
-    };
-
-    window.AjaxReady = AjaxReady;
 });

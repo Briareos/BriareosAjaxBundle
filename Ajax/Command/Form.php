@@ -2,9 +2,9 @@
 
 namespace Briareos\AjaxBundle\Ajax\Command;
 
-use Briareos\AjaxBundle\Ajax\Command\AjaxCommandInterface;
+use Briareos\AjaxBundle\Ajax\CommandInterface;
 
-class Form implements AjaxCommandInterface
+class Form implements CommandInterface
 {
     private $id;
 

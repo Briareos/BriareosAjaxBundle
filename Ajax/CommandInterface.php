@@ -1,8 +1,8 @@
 <?php
 
-namespace Briareos\AjaxBundle\Ajax\Command;
+namespace Briareos\AjaxBundle\Ajax;
 
-interface AjaxCommandInterface
+interface CommandInterface
 {
     public function getName();
 
