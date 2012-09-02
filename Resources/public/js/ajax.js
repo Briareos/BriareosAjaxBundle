@@ -13,6 +13,7 @@ $(function () {
 
     $context.ajaxSuccess(function (event, xhr, settings, data) {
         if ($.isPlainObject(data) && $.isArray(data.commands)) {
+            console.log(data.commands);
             for (var i = 0; i < data.commands.length; i++) {
                 var command = data.commands[i];
                 Ajax.command[command.name](command['arguments'], settings);
@@ -152,5 +153,13 @@ $(function () {
             History.pushState({body:settings.body}, settings.title, settings.url);
             History.programmatic = false;
         }
+    };
+
+    Ajax.command.settings = function (settings) {
+        window.setSettings(settings.event, settings.settings, $context);
+    };
+
+    window.setSettings = function (name, settings, $settingsContext) {
+        $settingsContext.trigger('settings.' + name, [settings]);
     };
 });

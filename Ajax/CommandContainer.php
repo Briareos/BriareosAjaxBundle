@@ -21,4 +21,16 @@ class CommandContainer implements \IteratorAggregate
         return new \ArrayIterator($this->commands);
     }
 
+    public function __toString()
+    {
+        $commands = array('commands');
+        /** @var $command CommandInterface */
+        foreach ($this->commands as $command) {
+            $commands['commands'][] = array(
+                'name' => $command->getName(),
+                'arguments' => $command->getArguments(),
+            );
+        }
+        return json_encode($commands);
+    }
 }

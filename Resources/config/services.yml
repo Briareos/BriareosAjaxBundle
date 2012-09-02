@@ -6,4 +6,16 @@ services:
             - @templating.name_parser
             - @templating.locator
             - @templating.globals
+    javascript_settings_container:
+        class: Briareos\AjaxBundle\Javascript\JavascriptSettingsContainer
+    kernel.listener.javascript_settings:
+        class: Briareos\AjaxBundle\EventListener\JavascriptSettingsListener
+        arguments: [ @javascript_settings_container ]
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+    twig.extension.javascript_settings:
+        class: Briareos\AjaxBundle\Twig\Extension\JavascriptSettings
+        arguments: [ @javascript_settings_container ]
+        tags:
+            - { name: twig.extension }
 
