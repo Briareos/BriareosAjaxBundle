@@ -18,4 +18,7 @@ services:
         arguments: [ @javascript_settings_container ]
         tags:
             - { name: twig.extension }
-
+    templating.ajax.helper:
+        class: Briareos\AjaxBundle\Ajax\Helper
+        arguments: [ @request, @templating.ajax ]
+        scope: request

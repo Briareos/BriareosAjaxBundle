@@ -14,7 +14,7 @@ class Page implements CommandInterface
 
     private $segment;
 
-    public function __construct($title, $body, $url, $segment = 'body')
+    public function __construct($title, $body, $url = false, $segment = 'body')
     {
         $this->title = $title;
         $this->body = $body;

@@ -13,7 +13,6 @@ $(function () {
 
     $context.ajaxSuccess(function (event, xhr, settings, data) {
         if ($.isPlainObject(data) && $.isArray(data.commands)) {
-            console.log(data.commands);
             for (var i = 0; i < data.commands.length; i++) {
                 var command = data.commands[i];
                 Ajax.command[command.name](command['arguments'], settings);
@@ -28,7 +27,7 @@ $(function () {
         }
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
-            $modal = $('<div class="modal modal-error fade hide"></div>');
+            $modal = $('<div class="modal hide modal-error fade in"></div>');
         } else {
             $modal.html('');
         }
@@ -46,14 +45,14 @@ $(function () {
         $iframe.appendTo($modalBody);
         setTimeout(function () {
             $iframe.contents().find('body').html(xhr.responseText);
-        }, 1);
+        }, 500);
         setTimeout(function () {
             $iframe.css({
                 width:$modalBody.width(),
                 height:$modalBody.height(),
                 border:'none'
             });
-        }, 1);
+        }, 500);
     });
 
     $context.ajaxComplete(function (event, xhr, settings) {
@@ -134,7 +133,7 @@ $(function () {
     Ajax.command.modal = function (settings) {
         var $modal = $('div.modal.modal-ajax');
         if (!$modal.length) {
-            $modal = $('<div class="modal modal-ajax fade hide"></div>');
+            $modal = $('<div class="modal hide modal-ajax fade in" role="dialog" tabindex="-1" aria-hidden="true"></div>');
         } else {
             $modal.html('');
         }
@@ -148,7 +147,7 @@ $(function () {
         if ($context.scrollTop() > $pjaxContent.offset().top) {
             $context.animate({scrollTop:$pjaxContent.offset().top - 10});
         }
-        if (ajaxSettings.context !== 'history') {
+        if (ajaxSettings.context !== 'history' && settings.url) {
             History.programmatic = true;
             History.pushState({body:settings.body}, settings.title, settings.url);
             History.programmatic = false;
