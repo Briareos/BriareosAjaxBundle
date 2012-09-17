@@ -142,10 +142,10 @@ $(function () {
     };
 
     Ajax.command.page = function (settings, ajaxSettings) {
-        var $pjaxContent = $(settings.body);
-        $context.find('[data-pjax-container="' + settings.segment + '"]').html($pjaxContent);
-        if ($context.scrollTop() > $pjaxContent.offset().top) {
-            $context.animate({scrollTop:$pjaxContent.offset().top - 10});
+        var $container =$context.find('[data-pjax-container="' + settings.segment + '"]');
+        $container.html(settings.body);
+        if ($context.scrollTop() > $container.offset().top) {
+            $context.animate({scrollTop:$container.offset().top - 55});
         }
         if (ajaxSettings.context !== 'history' && settings.url) {
             History.programmatic = true;
