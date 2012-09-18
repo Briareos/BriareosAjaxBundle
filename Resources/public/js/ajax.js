@@ -97,6 +97,9 @@ $(function () {
         $context.find('[data-pjax-container]').each(function () {
             pjaxContainers.push($(this).data('pjax-container'));
         });
+        $('.form-messages', $form).slideUp(function () {
+            $(this).remove();
+        });
         $form.ajaxSubmit({
             context:$form,
             data:{
@@ -142,7 +145,7 @@ $(function () {
     };
 
     Ajax.command.page = function (settings, ajaxSettings) {
-        var $container =$context.find('[data-pjax-container="' + settings.segment + '"]');
+        var $container = $context.find('[data-pjax-container="' + settings.segment + '"]');
         $container.html(settings.body);
         if ($context.scrollTop() > $container.offset().top) {
             $context.animate({scrollTop:$container.offset().top - 55});
