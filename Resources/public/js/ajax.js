@@ -3,7 +3,16 @@ $(function () {
 
     var $context = $('body');
     var History = window.History;
+    var undefined;
     History.programmatic = false;
+
+    $context.getPjaxContainers = function () {
+        var pjaxContainers = [];
+        this.find('[data-pjax-container]').each(function () {
+            pjaxContainers.push($(this).data('pjax-container'));
+        });
+        return pjaxContainers;
+    };
 
     $context.ajaxSend(function (event, xhr, settings) {
         if (typeof settings.context !== 'undefined' && settings.context.length) {
@@ -45,14 +54,14 @@ $(function () {
         $iframe.appendTo($modalBody);
         setTimeout(function () {
             $iframe.contents().find('body').html(xhr.responseText);
-        }, 500);
+        }, 300);
         setTimeout(function () {
             $iframe.css({
                 width:$modalBody.width(),
                 height:$modalBody.height(),
                 border:'none'
             });
-        }, 500);
+        }, 300);
     });
 
     $context.ajaxComplete(function (event, xhr, settings) {
@@ -60,16 +69,12 @@ $(function () {
 
     History.Adapter.bind(window, 'statechange', function () {
         var State = History.getState();
-        var pjaxContainers = [];
-        $context.find('[data-pjax-container]').each(function () {
-            pjaxContainers.push($(this).data('pjax-container'));
-        });
         if (History.programmatic === false) {
             $.ajax({
                 url:State.url,
                 context:'history',
                 data:{
-                    _pjax:pjaxContainers
+                    _pjax:$context.getPjaxContainers()
                 }
             });
         }
@@ -77,15 +82,12 @@ $(function () {
 
     $context.on('click', 'a[data-ajax]', function (event) {
         var $link = $(this);
-        var pjaxContainers = [];
-        $context.find('[data-pjax-container]').each(function () {
-            pjaxContainers.push($(this).data('pjax-container'));
-        });
         $.ajax({
             url:$link.attr('href'),
             context:$link,
             data:{
-                _pjax:pjaxContainers
+                _pjax:$context.getPjaxContainers(),
+                _modal:($link.attr('modal') !== undefined)
             }
         });
         return false;
@@ -93,17 +95,14 @@ $(function () {
 
     $context.on('submit', 'form[data-ajax]', function (event) {
         var $form = $(this);
-        var pjaxContainers = [];
-        $context.find('[data-pjax-container]').each(function () {
-            pjaxContainers.push($(this).data('pjax-container'));
-        });
         $('.form-messages', $form).slideUp(function () {
             $(this).remove();
         });
         $form.ajaxSubmit({
             context:$form,
             data:{
-                _pjax:pjaxContainers
+                _pjax:$context.getPjaxContainers(),
+                _modal:($form.attr('modal') !== undefined)
             }
         });
         return false;
@@ -158,7 +157,7 @@ $(function () {
     };
 
     Ajax.command.settings = function (settings) {
-        window.setSettings(settings.event, settings.settings, $context);
+        window.setSettings(settings.name, settings.settings, $context);
     };
 
     window.setSettings = function (name, settings, $settingsContext) {

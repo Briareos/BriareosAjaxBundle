@@ -53,4 +53,16 @@ class Helper
         $commands->add(new Ajax\Command\Form($this->ajax->render($templateFile, $templateParams)));
         return new Ajax\Response($commands);
     }
+
+    public function renderModal($templateFile, $templateParams)
+    {
+        $commands = new Ajax\CommandContainer();
+        $commands->add(new Ajax\Command\Modal($this->ajax->render($templateFile, $templateParams)));
+        return new Ajax\Response($commands);
+    }
+
+    public function isModal()
+    {
+        return (bool)$this->request->get('_modal', false);
+    }
 }

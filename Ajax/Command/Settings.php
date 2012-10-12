@@ -6,13 +6,13 @@ use Briareos\AjaxBundle\Ajax\CommandInterface;
 
 class Settings implements CommandInterface
 {
-    private $event;
+    private $name;
 
     private $settings;
 
-    public function __construct($event, array $settings)
+    public function __construct($name, array $settings)
     {
-        $this->event = $event;
+        $this->name = $name;
         $this->settings = $settings;
     }
 
@@ -24,7 +24,7 @@ class Settings implements CommandInterface
     public function getArguments()
     {
         return array(
-            'event' => $this->event,
+            'name' => $this->name,
             'settings' => $this->settings,
         );
     }
