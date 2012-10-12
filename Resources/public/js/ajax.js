@@ -136,12 +136,10 @@ $(function () {
     Ajax.command.modal = function (settings) {
         var $modal = $('div.modal.modal-ajax');
         if (!$modal.length) {
-            /* @TODO: Is this the best way to do it? */
             $modal = $('<div class="modal hide modal-ajax fade in" role="dialog" tabindex="-1" aria-hidden="true"></div>');
         } else {
             $modal.html('');
         }
-        /* @TODO: Consider making segments inside blocks and useing replaceWIth here */
         $modal.html(settings.body);
         $modal.modal('show');
     };
