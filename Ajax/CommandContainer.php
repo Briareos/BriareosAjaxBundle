@@ -23,7 +23,7 @@ class CommandContainer implements \IteratorAggregate
 
     public function __toString()
     {
-        $commands = array('commands');
+        $commands = array('commands' => array());
         /** @var $command CommandInterface */
         foreach ($this->commands as $command) {
             $commands['commands'][] = array(

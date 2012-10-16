@@ -10,7 +10,7 @@ class Location implements CommandInterface
 
     private $rewrite;
 
-    public function __construct($location, $rewrite)
+    public function __construct($location, $rewrite = false)
     {
         $this->location = $location;
         $this->rewrite = $rewrite;

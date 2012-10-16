@@ -65,4 +65,18 @@ class Helper
     {
         return (bool)$this->request->get('_modal', false);
     }
+
+    public function renderSettings($name, $settings)
+    {
+        $commands = new Ajax\CommandContainer();
+        $commands->add(new Ajax\Command\Settings($name, $settings));
+        return new Ajax\Response($commands);
+    }
+
+    public function location($location)
+    {
+        $commands = new Ajax\CommandContainer();
+        $commands->add(new Ajax\Command\Location($location));
+        return new Ajax\Response($commands);
+    }
 }

@@ -14,7 +14,7 @@ class JavascriptSettingsContainer
     }
 
     /**
-     * {@inheritdoc}
+     * @return JavascriptSettings[]
      */
     public function getJavascriptSettings()
     {

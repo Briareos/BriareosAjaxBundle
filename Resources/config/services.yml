@@ -6,16 +6,19 @@ services:
             - @templating.name_parser
             - @templating.locator
             - @templating.globals
-    javascript_settings_container:
+    javascript_settings.container:
         class: Briareos\AjaxBundle\Javascript\JavascriptSettingsContainer
-    kernel.listener.javascript_settings:
-        class: Briareos\AjaxBundle\EventListener\JavascriptSettingsListener
-        arguments: [ @javascript_settings_container ]
+    javascript_settings.injector_container:
+        class: Briareos\AjaxBundle\Javascript\JavascriptSettingsInjectorContainer
+    kernel.listener.javascript_settings.injector:
+        class: Briareos\AjaxBundle\EventListener\JavascriptSettingsInjectorListener
+        arguments: [ @javascript_settings.container, @javascript_settings.injector_container ]
         tags:
-            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -1024 }
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -1024 }
     twig.extension.javascript_settings:
         class: Briareos\AjaxBundle\Twig\Extension\JavascriptSettings
-        arguments: [ @javascript_settings_container ]
+        arguments: [ @javascript_settings.container ]
         tags:
             - { name: twig.extension }
     templating.ajax.helper:

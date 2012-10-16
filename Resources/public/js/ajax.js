@@ -6,6 +6,18 @@ $(function () {
     var undefined;
     History.programmatic = false;
 
+    var AjaxLoader = function ($context, $element) {
+        this.$context = $context;
+        this.$element = $element;
+    };
+    AjaxLoader.prototype.start = function () {
+        this.$element.fadeIn();
+    };
+
+    AjaxLoader.prototype.stop = function () {
+        this.$element.fadeOut();
+    };
+
     $context.getPjaxContainers = function () {
         var pjaxContainers = [];
         this.find('[data-pjax-container]').each(function () {
@@ -15,8 +27,14 @@ $(function () {
     };
 
     $context.ajaxSend(function (event, xhr, settings) {
-        if (typeof settings.context !== 'undefined' && settings.context.length) {
+        if (settings.context !== undefined && settings.context.length) {
+            $(':input', settings.context).prop('disabled', true);
             $('[type="submit"]', settings.context).button('loading');
+
+            if (settings.context.data('loader') !== undefined) {
+                settings.context.loader = new AjaxLoader(settings.context, $(settings.context.data('loader')));
+                settings.context.loader.start();
+            }
         }
     });
 
@@ -65,6 +83,9 @@ $(function () {
     });
 
     $context.ajaxComplete(function (event, xhr, settings) {
+        if (settings.context instanceof $ && settings.context.loader instanceof $) {
+            settings.context.loader.stop();
+        }
     });
 
     History.Adapter.bind(window, 'statechange', function () {
@@ -87,7 +108,7 @@ $(function () {
             context:$link,
             data:{
                 _pjax:$context.getPjaxContainers(),
-                _modal:($link.attr('modal') !== undefined)
+                _modal:($link.data('modal') !== undefined) ? 1 : 0
             }
         });
         return false;
@@ -102,7 +123,7 @@ $(function () {
             context:$form,
             data:{
                 _pjax:$context.getPjaxContainers(),
-                _modal:($form.attr('modal') !== undefined)
+                _modal:($form.data('modal') !== undefined) ? 1 : 0
             }
         });
         return false;
@@ -130,6 +151,7 @@ $(function () {
         });
         var formId = $form.attr('id');
         $('#' + formId, $context).replaceWith($form);
+        $(':input.error:first', $form).focus();
     };
 
     Ajax.command.modal = function (settings) {
