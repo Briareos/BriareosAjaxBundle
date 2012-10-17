@@ -27,11 +27,11 @@ $(function () {
     };
 
     $context.ajaxSend(function (event, xhr, settings) {
-        if (settings.context !== undefined && settings.context.length) {
+        if (settings.context instanceof $ && settings.context.length) {
             $(':input', settings.context).prop('disabled', true);
             $('[type="submit"]', settings.context).button('loading');
 
-            if (settings.context.data('loader') !== undefined) {
+            if (settings.context instanceof $ && settings.context.data('loader') !== undefined) {
                 settings.context.loader = new AjaxLoader(settings.context, $(settings.context.data('loader')));
                 settings.context.loader.start();
             }
@@ -98,6 +98,8 @@ $(function () {
                     _pjax:$context.getPjaxContainers()
                 }
             });
+        } else {
+            History.programmatic = false;
         }
     });
 
@@ -173,8 +175,7 @@ $(function () {
         }
         if (ajaxSettings.context !== 'history' && settings.url) {
             History.programmatic = true;
-            History.pushState({body:settings.body}, settings.title, settings.url);
-            History.programmatic = false;
+            History.pushState({body:settings.body, programmatic:true}, settings.title, settings.url);
         }
     };
 

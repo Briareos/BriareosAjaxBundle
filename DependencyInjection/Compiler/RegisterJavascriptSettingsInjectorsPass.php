@@ -20,8 +20,9 @@ class RegisterJavascriptSettingsInjectorsPass implements CompilerPassInterface
         $injector = $container->getDefinition('javascript_settings.injector_container');
 
         $settings = $container->findTaggedServiceIds('javascript_settings');
-        foreach ($settings as $id => $attributes) {
-            $injector->addMethodCall('addJavascriptSettingsInjector', array(new Reference($id)));
+        foreach ($settings as $serviceName => $tag) {
+            $priority = isset($tag[0]['priority']) ? $tag[0]['priority'] : 0;
+            $injector->addMethodCall('addJavascriptSettingsInjector', array(new Reference($serviceName), $priority));
         }
     }
 

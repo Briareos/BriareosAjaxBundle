@@ -31,15 +31,9 @@ class JavascriptSettingsInjectorListener
 
     public function onKernelResponse(FilterResponseEvent $event)
     {
-        foreach ($this->javascriptSettingsInjectorContainer->getJavascriptSettingsInjectors() as $javascriptSettingsInjector) {
-            /** @var $javascriptSettingsInjector \Briareos\AjaxBundle\Javascript\JavascriptSettingsInjectorInterface */
-            $javascriptSettingsInjector->onResponse($event, $this->javascriptSettingsContainer);
-        }
-
         $response = $event->getResponse();
         if ($response instanceof Ajax\Response) {
             foreach ($this->javascriptSettingsContainer->getJavascriptSettings() as $javascriptSettings) {
-                /** @var $javascriptSettings \Briareos\AjaxBundle\Javascript\JavascriptSettings */
                 $commandContainer = $response->getContent();
                 $commandContainer->add(new Ajax\Command\Settings($javascriptSettings->getName(), $javascriptSettings->getSettings()));
             }

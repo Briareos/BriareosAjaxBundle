@@ -8,9 +8,9 @@ class JavascriptSettingsInjectorContainer
 {
     private $javascriptSettingsInjectors = array();
 
-    public function addJavascriptSettingsInjector(JavascriptSettingsInjectorInterface $javascriptSettingsInjector)
+    public function addJavascriptSettingsInjector(JavascriptSettingsInjectorInterface $javascriptSettingsInjector, $priority = 0)
     {
-        $this->javascriptSettingsInjectors[] = $javascriptSettingsInjector;
+        $this->javascriptSettingsInjectors[$priority][] = $javascriptSettingsInjector;
     }
 
     /**
@@ -18,6 +18,13 @@ class JavascriptSettingsInjectorContainer
      */
     public function getJavascriptSettingsInjectors()
     {
-        return $this->javascriptSettingsInjectors;
+        $sorted = array();
+        ksort($this->javascriptSettingsInjectors);
+        foreach (array_reverse($this->javascriptSettingsInjectors) as $javascriptSettingsInjectors) {
+            foreach ($javascriptSettingsInjectors as $javascriptSettingsInjector) {
+                $sorted[] = $javascriptSettingsInjector;
+            }
+        }
+        return $sorted;
     }
 }

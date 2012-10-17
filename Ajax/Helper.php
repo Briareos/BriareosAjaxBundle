@@ -29,7 +29,10 @@ class Helper
 
     public function getPjaxParameters()
     {
-        return array('_pjax' => $this->getPjaxContainers());
+        if ($this->request->isXmlHttpRequest()) {
+            return array('_pjax' => $this->getPjaxContainers());
+        }
+        return array();
     }
 
     public function renderPjaxBlock($templateFile, $templateParams, $url, $requestedContainer = 'body')

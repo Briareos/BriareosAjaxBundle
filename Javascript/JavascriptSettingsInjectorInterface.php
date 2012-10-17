@@ -9,6 +9,4 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 interface JavascriptSettingsInjectorInterface
 {
     public function onRequest(GetResponseEvent $event, JavascriptSettingsContainer $settingsContainer);
-
-    public function onResponse(FilterResponseEvent $event, JavascriptSettingsContainer $settingsContainer);
 }
