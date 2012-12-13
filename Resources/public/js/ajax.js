@@ -6,35 +6,60 @@ $(function () {
     var undefined;
     History.programmatic = false;
 
-    var AjaxLoader = function ($context, $element) {
-        this.$context = $context;
+    var AjaxLoader = function ($element, effect) {
         this.$element = $element;
+        this.effect = effect;
     };
     AjaxLoader.prototype.start = function () {
-        this.$element.fadeIn();
+        if (this.effect === 'slide') {
+            this.$element.slideDown();
+        } else {
+            this.$element.fadeIn();
+        }
     };
 
     AjaxLoader.prototype.stop = function () {
-        this.$element.fadeOut();
+        if (this.effect === 'slide') {
+            this.$element.slideUp();
+        } else {
+            this.$element.fadeOut();
+        }
     };
 
-    $context.getPjaxContainers = function () {
+    $.fn.getPjaxContainers = function () {
         var pjaxContainers = [];
-        this.find('[data-pjax-container]').each(function () {
+        $(this).find('div[data-pjax-container]').each(function () {
             pjaxContainers.push($(this).data('pjax-container'));
         });
         return pjaxContainers;
     };
 
+    $.fn.ajaxLoader = function (command) {
+        if ($(this).loader === undefined) {
+            var ajaxLoader = false;
+            if ($(this).data('loader') !== undefined) {
+                ajaxLoader = new AjaxLoader($($(this).data('loader')), $(this).data('effect'));
+            }
+            $(this).data('AjaxLoader', ajaxLoader);
+        }
+        if ($(this).data('AjaxLoader') === false) {
+            return;
+        }
+        if (command === 'start') {
+            $(this).data('AjaxLoader').start();
+        }
+        else if (command === 'stop') {
+            $(this).data('AjaxLoader').stop();
+        }
+    };
+
     $context.ajaxSend(function (event, xhr, settings) {
         if (settings.context instanceof $ && settings.context.length) {
-            $(':input', settings.context).prop('disabled', true);
-            $('[type="submit"]', settings.context).button('loading');
-
-            if (settings.context instanceof $ && settings.context.data('loader') !== undefined) {
-                settings.context.loader = new AjaxLoader(settings.context, $(settings.context.data('loader')));
-                settings.context.loader.start();
+            if (settings.context.prop('tagName') === 'FORM') {
+                $(':submit', settings.context).button('loading');
             }
+
+            settings.context.ajaxLoader('start');
         }
     });
 
@@ -52,6 +77,7 @@ $(function () {
             // Browser was refreshed during an ajax request.
             return;
         }
+        // Reuse our modal window.
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
             $modal = $('<div class="modal hide modal-error fade in"></div>');
@@ -83,8 +109,12 @@ $(function () {
     });
 
     $context.ajaxComplete(function (event, xhr, settings) {
-        if (settings.context instanceof $ && settings.context.loader instanceof $) {
-            settings.context.loader.stop();
+        if (settings.context instanceof $) {
+            if (settings.context.prop('tagName') === 'FORM') {
+                $(':submit', settings.context).button('reset');
+            }
+
+            settings.context.ajaxLoader('stop');
         }
     });
 
