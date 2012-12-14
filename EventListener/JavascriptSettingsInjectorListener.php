@@ -24,7 +24,6 @@ class JavascriptSettingsInjectorListener
     public function onKernelRequest(GetResponseEvent $event)
     {
         foreach ($this->javascriptSettingsInjectorContainer->getJavascriptSettingsInjectors() as $javascriptSettingsInjector) {
-            /** @var $javascriptSettingsInjector \Briareos\AjaxBundle\Javascript\JavascriptSettingsInjectorInterface */
             $javascriptSettingsInjector->onRequest($event, $this->javascriptSettingsContainer);
         }
     }

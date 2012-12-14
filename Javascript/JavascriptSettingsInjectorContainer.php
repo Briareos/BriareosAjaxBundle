@@ -14,7 +14,7 @@ class JavascriptSettingsInjectorContainer
     }
 
     /**
-     * @return JavascriptSettings[]
+     * @return JavascriptSettingsInjectorInterface[]
      */
     public function getJavascriptSettingsInjectors()
     {

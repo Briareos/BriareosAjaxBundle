@@ -26,6 +26,10 @@ $(function () {
         }
     };
 
+    AjaxLoader.prototype.bar = function (options) {
+        $('div.bar', this.$element).animate({'width':options.width});
+    };
+
     $.fn.getPjaxContainers = function () {
         var pjaxContainers = [];
         $(this).find('div[data-pjax-container]').each(function () {
@@ -34,8 +38,8 @@ $(function () {
         return pjaxContainers;
     };
 
-    $.fn.ajaxLoader = function (command) {
-        if ($(this).loader === undefined) {
+    $.fn.ajaxLoader = function (command, commandArguments) {
+        if ($(this).data('AjaxLoader') === undefined) {
             var ajaxLoader = false;
             if ($(this).data('loader') !== undefined) {
                 ajaxLoader = new AjaxLoader($($(this).data('loader')), $(this).data('effect'));
@@ -45,12 +49,7 @@ $(function () {
         if ($(this).data('AjaxLoader') === false) {
             return;
         }
-        if (command === 'start') {
-            $(this).data('AjaxLoader').start();
-        }
-        else if (command === 'stop') {
-            $(this).data('AjaxLoader').stop();
-        }
+        $(this).data('AjaxLoader')[command](commandArguments);
     };
 
     $context.ajaxSend(function (event, xhr, settings) {
@@ -125,7 +124,7 @@ $(function () {
                 url:State.url,
                 context:'history',
                 data:{
-                    _pjax:$context.getPjaxContainers()
+                    _pjax:$context.getPjaxContainers().join(',')
                 }
             });
         } else {
@@ -139,7 +138,7 @@ $(function () {
             url:$link.attr('href'),
             context:$link,
             data:{
-                _pjax:$context.getPjaxContainers(),
+                _pjax:$context.getPjaxContainers().join(','),
                 _modal:($link.data('modal') !== undefined) ? 1 : 0
             }
         });
@@ -154,7 +153,7 @@ $(function () {
         $form.ajaxSubmit({
             context:$form,
             data:{
-                _pjax:$context.getPjaxContainers(),
+                _pjax:$context.getPjaxContainers().join(','),
                 _modal:($form.data('modal') !== undefined) ? 1 : 0
             }
         });
@@ -199,6 +198,7 @@ $(function () {
 
     Ajax.command.page = function (settings, ajaxSettings) {
         var $container = $context.find('[data-pjax-container="' + settings.segment + '"]');
+        $container.attach();
         $container.html(settings.body);
         if ($context.scrollTop() > $container.offset().top) {
             $context.animate({scrollTop:$container.offset().top - 55});
@@ -211,6 +211,10 @@ $(function () {
 
     Ajax.command.settings = function (settings) {
         window.setSettings(settings.name, settings.settings, $context);
+    };
+
+    $.fn.attach = function () {
+        // This should be overridden.
     };
 
     window.setSettings = function (name, settings, $settingsContext) {

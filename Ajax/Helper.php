@@ -21,18 +21,18 @@ class Helper
     public function getPjaxContainers()
     {
         $pjax = $this->request->get('_pjax', array());
-        if (!is_array($pjax)) {
+        if (is_scalar($pjax) && strlen($pjax) > 0) {
+            $pjax = explode(',', $pjax);
+        } else {
             $pjax = array();
         }
+
         return $pjax;
     }
 
     public function getPjaxParameters()
     {
-        if ($this->request->isXmlHttpRequest()) {
-            return array('_pjax' => $this->getPjaxContainers());
-        }
-        return array();
+        return array('_pjax' => $this->getPjaxContainers());
     }
 
     public function renderPjaxBlock($templateFile, $templateParams, $url, $requestedContainer = 'body')
@@ -47,6 +47,7 @@ class Helper
         $title = $this->ajax->renderBlock($templateFile, 'title', $templateParams);
         $body = $this->ajax->renderBlock($templateFile, $container, $templateParams);
         $commands->add(new Ajax\Command\Page($title, $body, $url, $container));
+
         return new Ajax\Response($commands);
     }
 
@@ -54,6 +55,7 @@ class Helper
     {
         $commands = new Ajax\CommandContainer();
         $commands->add(new Ajax\Command\Form($this->ajax->render($templateFile, $templateParams)));
+
         return new Ajax\Response($commands);
     }
 
@@ -61,18 +63,20 @@ class Helper
     {
         $commands = new Ajax\CommandContainer();
         $commands->add(new Ajax\Command\Modal($this->ajax->render($templateFile, $templateParams)));
+
         return new Ajax\Response($commands);
     }
 
     public function isModal()
     {
-        return (bool)$this->request->get('_modal', false);
+        return (bool) $this->request->get('_modal', false);
     }
 
     public function renderSettings($name, $settings)
     {
         $commands = new Ajax\CommandContainer();
         $commands->add(new Ajax\Command\Settings($name, $settings));
+
         return new Ajax\Response($commands);
     }
 
@@ -80,6 +84,7 @@ class Helper
     {
         $commands = new Ajax\CommandContainer();
         $commands->add(new Ajax\Command\Location($location));
+
         return new Ajax\Response($commands);
     }
 }
