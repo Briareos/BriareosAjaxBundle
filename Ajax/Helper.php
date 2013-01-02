@@ -39,13 +39,18 @@ class Helper
     {
         $commands = new Ajax\CommandContainer();
         $pjaxContainers = $this->getPjaxContainers();
+
         if (in_array($requestedContainer, $pjaxContainers)) {
             $container = $requestedContainer;
+            $block = $container;
+            if (strpos($block, '-') !== false) {
+                $block = explode('-', $block)[0];
+            }
         } else {
-            $container = 'body';
+            $container = $block = 'body';
         }
         $title = $this->ajax->renderBlock($templateFile, 'title', $templateParams);
-        $body = $this->ajax->renderBlock($templateFile, $container, $templateParams);
+        $body = $this->ajax->renderBlock($templateFile, $block, $templateParams);
         $commands->add(new Ajax\Command\Page($title, $body, $url, $container));
 
         return new Ajax\Response($commands);

@@ -213,6 +213,14 @@ $(function () {
         window.setSettings(settings.name, settings.settings, $context);
     };
 
+    Ajax.command.html = function (settings) {
+        if (settings.replace) {
+            $(settings.selector).replaceWith(settings.html);
+        } else {
+            $(settings.selector).html(settings.html);
+        }
+    };
+
     $.fn.attach = function () {
         // This should be overridden.
     };
