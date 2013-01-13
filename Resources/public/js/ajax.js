@@ -79,7 +79,7 @@ $(function () {
         // Reuse our modal window.
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
-            $modal = $('<div class="modal hide modal-error fade in"></div>');
+            $modal = $('<div class="modal modal-overflow container hide modal-error fade in"></div>');
         } else {
             $modal.html('');
         }
@@ -100,8 +100,8 @@ $(function () {
         }, 300);
         setTimeout(function () {
             $iframe.css({
-                width:$modalBody.width(),
-                height:$modalBody.height(),
+                width:$iframe.contents().width(),
+                height:$iframe.contents().height(),
                 border:'none'
             });
         }, 300);
@@ -186,14 +186,18 @@ $(function () {
     };
 
     Ajax.command.modal = function (settings) {
-        var $modal = $('div.modal.modal-ajax');
-        if (!$modal.length) {
-            $modal = $('<div class="modal hide modal-ajax fade in" role="dialog" tabindex="-1" aria-hidden="true"></div>');
+        var $newModal = $(settings.body);
+        var modalId = $newModal.attr('id');
+        if (modalId) {
+            modalId = '#' + modalId;
         } else {
-            $modal.html('');
+            modalId = '';
         }
-        $modal.html(settings.body);
-        $modal.modal('show');
+        var $oldModal = $('div.modal' + modalId + ':visible');
+        if ($oldModal.length) {
+            $oldModal.modal('hide');
+        }
+        $newModal.modal('show');
     };
 
     Ajax.command.page = function (settings, ajaxSettings) {
@@ -228,4 +232,5 @@ $(function () {
     window.setSettings = function (name, settings, $settingsContext) {
         $settingsContext.trigger('settings.' + name, [settings]);
     };
-});
+})
+;

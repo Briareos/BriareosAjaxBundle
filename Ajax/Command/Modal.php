@@ -8,6 +8,8 @@ class Modal implements CommandInterface
 {
     private $body;
 
+    private $id;
+
     public function __construct($body)
     {
         $this->body = $body;
