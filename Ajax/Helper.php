@@ -32,7 +32,7 @@ class Helper
 
     public function getPjaxParameters()
     {
-        return array('_pjax' => $this->getPjaxContainers());
+        return array('_pjax' => implode(',', $this->getPjaxContainers()));
     }
 
     public function renderPjaxBlock($templateFile, $templateParams, $url, $requestedContainer = 'body')
