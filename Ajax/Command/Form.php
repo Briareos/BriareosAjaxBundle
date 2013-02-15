@@ -12,7 +12,8 @@ class Form implements CommandInterface
 
     public function __construct($body)
     {
-        $this->body = $body;
+        // jQuery 1.9+ treats newlines as DOM elements, so we need to get rid of them.
+        $this->body = trim($body);
     }
 
     public function getName()

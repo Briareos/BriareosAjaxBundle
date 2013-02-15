@@ -273,7 +273,7 @@ $(function () {
     };
 
     Ajax.command.form = function (settings) {
-        var $form = $(settings.body);
+        var $form = $($.parseHTML(settings.body));
         $('.flash-messages', $context).slideUp(function () {
             $(this).remove();
         });
@@ -283,7 +283,7 @@ $(function () {
     };
 
     Ajax.command.modal = function (settings) {
-        var $newModal = $(settings.body);
+        var $newModal = $($.parseHTML(settings.body));
         var modalId = $newModal.attr('id');
         if (!modalId) {
             modalId = 'modal-default';
