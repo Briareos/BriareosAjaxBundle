@@ -55,7 +55,7 @@ $(function () {
         if (this.type === 'overlay') {
             this.$overlay = this.createOverlay();
             this.$overlay.css(this.getOverlayPosition());
-            this.$element.append(this.$overlay);
+            this.$element.after(this.$overlay);
 
             if (this.effect === 'slide') {
                 this.$overlay.slideDown();
@@ -83,9 +83,9 @@ $(function () {
     };
 
     AjaxLoader.prototype.getOverlayPosition = function () {
-        var position = this.$element.offset();
-        position.width = this.$element.width();
-        position.height = this.$element.height();
+        var position = this.$element.position();
+        position.width = this.$element.outerWidth();
+        position.height = this.$element.outerHeight();
         return position;
     };
 
@@ -94,6 +94,9 @@ $(function () {
      */
     AjaxLoader.prototype.stop = function () {
         if (this.type === 'overlay') {
+            if (!this.$overlay) {
+                return;
+            }
             if (this.effect === 'slide') {
                 this.$overlay.slideUp(function () {
                     $(this).remove();
@@ -160,6 +163,11 @@ $(function () {
     });
 
     $document.ajaxSuccess(function (event, xhr, settings, data) {
+        // @TODO move this to $.ajaxComplete after the bug where it doesn't fire is fixed
+        if (settings.context instanceof $) {
+            settings.context.ajaxDone(event, xhr, settings);
+        }
+
         if ($.isPlainObject(data) && $.isArray(data.commands)) {
             for (var i = 0; i < data.commands.length; i++) {
                 var command = data.commands[i];
@@ -173,10 +181,14 @@ $(function () {
             // Browser was refreshed during an ajax request.
             return;
         }
+        // @TODO move this to $.ajaxComplete after the bug where it doesn't fire is fixed
+        if (settings.context instanceof $) {
+            settings.context.ajaxDone();
+        }
         // Reuse our modal window.
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
-            $modal = $('<div class="modal modal-overflow container hide modal-error fade in"></div>');
+            $modal = $('<div class="modal modal-overflow container hide modal-error"></div>');
         } else {
             $modal.html('');
         }
@@ -205,14 +217,16 @@ $(function () {
     });
 
     $document.ajaxComplete(function (event, xhr, settings) {
-        if (settings.context instanceof $) {
-            if (settings.context.prop('tagName') === 'FORM') {
-                $(':submit', settings.context).button('reset');
-            }
 
-            settings.context.ajaxLoader('stop');
-        }
     });
+
+    $.fn.ajaxDone = function () {
+        if (this.prop('tagName') === 'FORM') {
+            $(':submit', this).button('reset');
+        }
+
+        this.ajaxLoader('stop');
+    };
 
     History.Adapter.bind(window, 'statechange', function () {
         var State = History.getState();
@@ -283,7 +297,10 @@ $(function () {
     };
 
     Ajax.command.modal = function (settings) {
-        var $newModal = $($.parseHTML(settings.body));
+        var $newModal = false;
+        if (settings.body) {
+            $newModal = $($.parseHTML(settings.body));
+        }
         var modalId = $newModal.attr('id');
         if (!modalId) {
             modalId = 'modal-default';
@@ -293,7 +310,22 @@ $(function () {
         if ($oldModal.length) {
             $oldModal.modal('hide');
         }
-        $newModal.modal('show');
+        if ($newModal) {
+            $newModal.modal('show');
+        }
+    };
+
+    Ajax.command.modalClose = function (settings) {
+        var $modal = [];
+        if (settings.id) {
+            var id = settings.id;
+            $modal = $('div.modal#' + id + ':visible', $context);
+        } else {
+            $modal = $('div.modal:visible', $context);
+        }
+        if ($modal.length) {
+            $modal.modal('hide');
+        }
     };
 
     Ajax.command.page = function (settings, ajaxSettings) {
