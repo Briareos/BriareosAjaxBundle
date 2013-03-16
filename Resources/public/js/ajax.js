@@ -165,7 +165,7 @@ $(function () {
     $document.ajaxSuccess(function (event, xhr, settings, data) {
         // @TODO move this to $.ajaxComplete after the bug where it doesn't fire is fixed
         if (settings.context instanceof $) {
-            settings.context.ajaxDone(event, xhr, settings);
+            settings.context.ajaxDone();
         }
 
         if ($.isPlainObject(data) && $.isArray(data.commands)) {
@@ -188,7 +188,7 @@ $(function () {
         // Reuse our modal window.
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
-            $modal = $('<div class="modal modal-overflow container hide modal-error"></div>');
+            $modal = $('<div class="modal modal-error"><div class="modal-dialog"><div class="modal-content"></div></div></div>');
         } else {
             $modal.html('');
         }
@@ -309,6 +309,9 @@ $(function () {
         var $oldModal = $('div.modal#' + modalId + ':visible', $context);
         if ($oldModal.length) {
             $oldModal.modal('hide');
+            $oldModal.on('hidden', function () {
+                $(this).remove();
+            })
         }
         if ($newModal) {
             $newModal.modal('show');
@@ -362,5 +365,4 @@ $(function () {
     window.setSettings = function (name, settings, $settingsContext) {
         $settingsContext.trigger('settings.' + name, [settings]);
     };
-})
-;
+});
