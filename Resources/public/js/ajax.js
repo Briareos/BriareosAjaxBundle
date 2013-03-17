@@ -188,18 +188,20 @@ $(function () {
         // Reuse our modal window.
         var $modal = $('div.modal.modal-error');
         if (!$modal.length) {
-            $modal = $('<div class="modal modal-error"><div class="modal-dialog"><div class="modal-content"></div></div></div>');
+            $modal = $('<div class="modal fade in modal-error"></div>');
         } else {
             $modal.html('');
         }
+        var $modalContainer = $('<div class="container"></div>').appendTo($modal);
+        var $modalContent = $('<div class="modal-content"></div>').appendTo($modalContainer);
 
         var $modalHeader = $('<div class="modal-header"></div>')
             .append('<button type="button" class="close" data-dismiss="modal">×</button>')
             .append($('<h3></h3>').text(xhr.status + ' ' + error))
             .append($('<span></span>').text(settings.type + ' ' + settings.url));
-        $modalHeader.appendTo($modal);
+        $modalHeader.appendTo($modalContent);
         var $modalBody = $('<div class="modal-body"></div>')
-            .appendTo($modal);
+            .appendTo($modalContent);
         $modal.modal('show');
 
         var $iframe = $('<iframe/>');
@@ -309,12 +311,12 @@ $(function () {
         var $oldModal = $('div.modal#' + modalId + ':visible', $context);
         if ($oldModal.length) {
             $oldModal.modal('hide');
-            $oldModal.on('hidden', function () {
-                $(this).remove();
-            })
         }
         if ($newModal) {
             $newModal.modal('show');
+            $newModal.on('hidden', function () {
+                $(this).remove();
+            });
         }
     };
 
